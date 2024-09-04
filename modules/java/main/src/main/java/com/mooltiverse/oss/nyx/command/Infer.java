@@ -18,6 +18,7 @@ package com.mooltiverse.oss.nyx.command;
 import static com.mooltiverse.oss.nyx.log.Markers.COMMAND;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -214,13 +215,14 @@ public class Infer extends AbstractCommand {
      * @param primeBumpIdentifiers a set of version component identifiers that this method will fill for every commit that is
      * significant since the prime version, according to the given {@code commitMessageConventions}. It should be empty and must
      * not be {@code null}. Consider the values of this collection an output of this method.
-     * 
+     * @param excludePaths commits that only occur on files in this collection of paths will be filtered out
+     *
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
      * @throws GitException in case of unexpected issues when accessing the Git repository.
      * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      */
-    private void scanRepository(Scheme scheme, String bump, boolean releaseLenient, String releasePrefix, boolean collapsedVersioning, String filterTagsExpression, Map<String,CommitMessageConvention> commitMessageConventions, List<Commit> previousSignificantCommits, Set<String> previousBumpIdentifiers, List<Commit> primeSignificantCommits, Set<String> primeBumpIdentifiers)
+    private void scanRepository(Scheme scheme, String bump, boolean releaseLenient, String releasePrefix, boolean collapsedVersioning, String filterTagsExpression, Map<String,CommitMessageConvention> commitMessageConventions, List<Commit> previousSignificantCommits, Set<String> previousBumpIdentifiers, List<Commit> primeSignificantCommits, Set<String> primeBumpIdentifiers, Collection<String> excludePaths)
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         Objects.requireNonNull(scheme, "The scheme cannot be null");
         Objects.requireNonNull(previousSignificantCommits, "The list of previous significant commits cannot be null cannot be null");
@@ -342,7 +344,7 @@ public class Infer extends AbstractCommand {
             // stop walking the commit history if we already have the previous and prime versions (and their commits), otherwise keep walking
             return !(state().getReleaseScope().hasPreviousVersion() && state().getReleaseScope().hasPreviousVersionCommit() &&
                         state().getReleaseScope().hasPrimeVersion() && state().getReleaseScope().hasPrimeVersionCommit());
-        });
+        }, excludePaths);
         logger.debug(COMMAND, "Walking the commit history finished. The release scope contains {} commits.", state().getReleaseScope().getCommits().size());
 
         if (collapsedVersioning) {
@@ -967,7 +969,7 @@ public class Infer extends AbstractCommand {
             // STEP 1: scan the Git repository to collect informations from the commit history
             scanRepository(state().getScheme(), state().getBump(), state().getConfiguration().getReleaseLenient().booleanValue(), state().getConfiguration().getReleasePrefix(), state().getReleaseType().getCollapseVersions(), renderTemplate(state().getReleaseType().getFilterTags()), state().getConfiguration().getCommitMessageConventions().getItems(),
                 previousSignificantCommits, previousBumpIdentifiers,
-                primeSignificantCommits, primeBumpIdentifiers);
+                primeSignificantCommits, primeBumpIdentifiers, state().getConfiguration().getExcludePaths());
 
             // STEP 2: use default values for those attributes that were not found in the Git commit history
             fillStateMissingValuesWithDefaults(state().getReleaseType());

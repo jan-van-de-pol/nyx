@@ -15,6 +15,7 @@
  */
 package com.mooltiverse.oss.nyx.configuration;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,10 +23,12 @@ import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
 import com.mooltiverse.oss.nyx.entities.Substitutions;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
+import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
@@ -146,6 +149,11 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      * The value held by this object.
      */
     private String version = null;
+
+    /**
+     * The value held by this object.
+     */
+    private Collection<String> excludePaths = null;
 
     /**
      * Default constructor.
@@ -544,4 +552,19 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
     public void setVersion(String version) {
         this.version = version;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<String> getExcludePaths() {
+        return excludePaths;
+    }
+
+    /**
+     * Sets the value for this option.
+     *
+     * @param excludePaths the value for this option.
+     */
+    public void setVersion(Collection<String> excludePaths) { this.excludePaths = excludePaths; }
 }

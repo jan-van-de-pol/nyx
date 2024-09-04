@@ -479,10 +479,11 @@ public interface Repository {
      * within the repository a {@link GitException} is thrown.
      * @param visitor the visitor function that will receive commit data to evaluate. If {@code null} this method
      * takes no action.
-     * 
+     * @param excludePaths commits that only occur on files in this collection of paths will be filtered out
+     *
      * @throws GitException in case some problem is encountered with the underlying Git repository, including when
      * the repository has no commits yet or a given commit identifier cannot be resolved.
      */
-    public void walkHistory(String start, String end, CommitVisitor visitor)
+    public void walkHistory(String start, String end, CommitVisitor visitor, Collection<String> excludePaths)
         throws GitException;
 }

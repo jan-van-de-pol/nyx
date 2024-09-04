@@ -17,6 +17,7 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import static com.mooltiverse.oss.nyx.log.Markers.DEFAULT;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
@@ -314,5 +315,16 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "version", VERSION);
         return VERSION;
+    }
+
+    /**
+     * Returns the list of paths to exclude for use when filtering commits.
+     *
+     * @return the list of paths to exclude during filtering commits.
+     */
+    public Collection<String> getExcludePaths()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "version", EXCLUDE_PATHS);
+        return EXCLUDE_PATHS;
     }
 }

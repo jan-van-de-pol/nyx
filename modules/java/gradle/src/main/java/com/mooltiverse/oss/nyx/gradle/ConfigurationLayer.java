@@ -18,6 +18,8 @@ package com.mooltiverse.oss.nyx.gradle;
 import static org.gradle.api.Project.DEFAULT_VERSION;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -456,5 +458,15 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
         else {
             return projectVersion.toString();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<String> getExcludePaths() {
+        return extension.getExcludePaths().isPresent()
+                ? Arrays.stream(extension.getExcludePaths().get().split(",")).toList()
+                : null;
     }
 }

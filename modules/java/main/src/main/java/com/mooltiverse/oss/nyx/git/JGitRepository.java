@@ -73,6 +73,8 @@ import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.transport.ssh.jsch.JschConfigSessionFactory;
 import org.eclipse.jgit.transport.ssh.jsch.OpenSshConfig.Host;
+import org.eclipse.jgit.treewalk.filter.NotTreeFilter;
+import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
 import org.eclipse.jgit.util.FS;
 import org.slf4j.event.Level;
 import org.slf4j.Logger;
@@ -1067,7 +1069,7 @@ class JGitRepository implements Repository {
                     command.setTagger(new PersonIdent(tagger.getName(), tagger.getEmail()));
                 }
             }
-            command.setForceUpdate​(force); // Tags may be rewritten/updated especially when using aliases (multiple tag names)
+            command.setForceUpdate(force); // Tags may be rewritten/updated especially when using aliases (multiple tag names)
             return ObjectFactory.tagFrom(jGit.getRepository().getRefDatabase().peel(command.setName(name).call()));
         }
         catch (GitAPIException | JGitInternalException | IOException e) {
@@ -1079,13 +1081,16 @@ class JGitRepository implements Repository {
      * {@inheritDoc}
      */
     @Override
-    public void walkHistory(String start, String end, CommitVisitor visitor)
+    public void walkHistory(String start, String end, CommitVisitor visitor, Collection<String> excludePaths)
         throws GitException {
         if (Objects.isNull(visitor))
             return;
         logger.debug(GIT, "Walking commit history. Start commit boundary is '{}'. End commit boundary is '{}'", Objects.isNull(start) ? "not defined" : start, Objects.isNull(end) ? "not defined" : end);
 
         RevWalk rw = new RevWalk(jGit.getRepository());
+        if (excludePaths != null && excludePaths.size() > 0) {
+            rw.setTreeFilter(NotTreeFilter.create(PathFilterGroup.createFromStrings(excludePaths)));
+        }
         try {
             // follow the first parent upon merge commits
             rw.setFirstParent(true); // this must always be called before markStart

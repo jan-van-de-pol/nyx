@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.OutputStream;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -273,11 +275,33 @@ public class Workbench {
      * 
      * @see #getFiles()
      */
-    public Collection<File> addRandomTextWorkbenchFiles(int count)
-        throws Exception {
+    public Collection<File> addRandomTextWorkbenchFiles(int count) throws Exception {
+        return addRandomTextWorkbenchFiles(count, "");
+    }
+
+    /**
+     * Adds the given number of text files to the repository root directory. Files have content but they are not staged or committed.
+     *
+     * @param count the number of files to add
+     *
+     * @param subPath the subpath to create the random text files in
+     *
+     * @return the collection of the new files
+     *
+     * @throws Exception in case of any issue
+     *
+     * @see #getFiles()
+     */
+    public Collection<File> addRandomTextWorkbenchFiles(int count, String subPath)
+            throws Exception {
         Collection<File> res = new ArrayList<File>();
+        Path directoryPath = Path.of(git.getRepository().getWorkTree().getPath(), subPath);
+        if (Files.notExists(directoryPath)) {
+            Files.createDirectories(directoryPath);
+        }
+        String pathString = directoryPath.toString();
         for (int i=0; i<=count; i++) {
-            File f = new File(git.getRepository().getWorkTree(), RandomUtil.randomAlphabeticString(5).concat(".txt"));
+            File f = new File(pathString, RandomUtil.randomAlphabeticString(5).concat(".txt"));
             FileWriter fw = new FileWriter(f);
             fw.write(RandomUtil.randomAlphabeticString(5));
             fw.flush();

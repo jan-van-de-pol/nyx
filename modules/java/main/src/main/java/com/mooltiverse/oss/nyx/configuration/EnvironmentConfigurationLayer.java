@@ -18,6 +18,7 @@ package com.mooltiverse.oss.nyx.configuration;
 import static com.mooltiverse.oss.nyx.log.Markers.CONFIGURATION;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Formatter;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import com.mooltiverse.oss.nyx.io.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -853,6 +855,11 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     private static final String VERSION_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("VERSION");
 
     /**
+     * The name of the environment variable to read for this value. Value: {@value}
+     */
+    private static final String EXCLUDE_PATHS_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("EXCLUDE_PATHS");
+
+    /**
      * The private instance of the changelog configuration section.
      */
     private ChangelogConfiguration changelogSection = null;
@@ -1532,5 +1539,12 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     @Override
     public String getVersion() {
         return getenv(VERSION_ENVVAR_NAME);
+    }
+
+    @Override
+    public Collection<String> getExcludePaths() throws DataAccessException, IllegalPropertyException {
+        return Objects.isNull(getenv(VERBOSITY_ENVVAR_NAME))
+                ? null
+                : Arrays.stream(getenv(EXCLUDE_PATHS_ENVVAR_NAME).split(",")).toList();
     }
 }

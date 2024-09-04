@@ -232,6 +232,23 @@ public class Script extends Workbench {
     }
 
     /**
+     * Adds the given number of files to the repository. Files have content but they are not staged or committed.
+     *
+     * @param count the number of files to add
+     *
+     * @param subPath the subpath to create the random text files in
+     *
+     * @return this same instance
+     *
+     * @throws Exception in case of any issue
+     */
+    public Script andAddFilesInSubDirectory(int count, String subPath)
+        throws Exception {
+        addRandomTextWorkbenchFiles(count, subPath);
+        return this;
+    }
+
+    /**
      * Changes the contents of all files in the repository. Changes are not staged or committed.
      * 
      * @return this same instance

@@ -15,6 +15,7 @@
  */
 package com.mooltiverse.oss.nyx.entities;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -272,4 +273,9 @@ public interface Defaults {
      * The default release version. Value: {@code null}
      */
     public static final String VERSION = null;
+
+    /**
+     * The default exclude paths. Value: {@code null}
+     */
+    public static final Collection<String> EXCLUDE_PATHS = null;
 }

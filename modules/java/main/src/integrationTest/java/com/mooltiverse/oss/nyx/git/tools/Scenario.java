@@ -93,6 +93,29 @@ public enum Scenario {
     ),
 
     /**
+     * The scenario where the Git repository has been created with a few untagged commits. Some commits target
+     * specific sub directories (pathA, pathB)
+     * This yields to a repository like:
+     *
+     * <pre>
+     *   * cb9423c (HEAD -> master)
+     *   * ddb0b9f Untagged commit #4 containing a random textfile in subdirectory pathA and pathB
+     *   * ddb0b9f Untagged commit #3 containing a random textfile in subdirectory pathB
+     *   * ddb0b9f Untagged commit #2 containing a random textfile in subdirectory pathA
+     *   * ddb0b9f Untagged commit #1 containing a random textfile in subdirectory pathA
+     *   * 2b0ce8c Initial commit
+     * </pre>
+     */
+    BRANCH_WITH_SUBDIRS( f -> Script.from(f)
+            .andAddFiles().andStage().andCommit("Initial commit")
+            .andAddFilesInSubDirectory(1, "pathA").andStage().andCommit("Untagged commit #1")
+            .andAddFilesInSubDirectory(1, "pathA").andStage().andCommit("Untagged commit #2")
+            .andAddFilesInSubDirectory(1, "pathB").andStage().andCommit("Untagged commit #3")
+            .andAddFilesInSubDirectory(1, "pathA")
+            .andAddFilesInSubDirectory(1, "pathB").andStage().andCommit("Untagged commit #4")
+    ),
+
+    /**
      * The scenario where the Git repository has been created with a few tagged commits plus a couple of trailing
      * untagged commits.
      * Commit messages are formatted as conventional commits.

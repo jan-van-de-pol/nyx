@@ -2023,7 +2023,7 @@ public class JGitRepositoryTests {
             repository.walkHistory(null, null, c -> {
                 visitedCommits.add(c);
                 return true;
-            });
+            }, null);
 
             assertEquals(10, visitedCommits.size());
             // make sure the last one is the root commit
@@ -2038,7 +2038,7 @@ public class JGitRepositoryTests {
             Repository repository = JGitRepository.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory());
             assertThrows(GitException.class, () -> repository.walkHistory(null, null, c -> {
                 return true;
-            }));
+            }, null));
         }
 
         @DisplayName("JGitRepository.walkHistory(null, null, CommitVisitor) stopped by CommitVisitor")
@@ -2053,7 +2053,7 @@ public class JGitRepositoryTests {
             repository.walkHistory(null, null, c -> {
                 visitedCommits.add(c);
                 return visitedCommits.size() < 2;
-            });
+            }, null);
 
             assertEquals(2, visitedCommits.size());
         }
@@ -2069,7 +2069,7 @@ public class JGitRepositoryTests {
             repository.walkHistory(null, null, c -> {
                 visitedCommits.add(c);
                 return true;
-            });
+            }, null);
 
             assertEquals(10, visitedCommits.size());
             
@@ -2078,7 +2078,7 @@ public class JGitRepositoryTests {
             repository.walkHistory(visitedCommits.get(2).getSHA(), null, c -> {
                 boundaryVisitedCommits.add(c);
                 return true;
-            });
+            }, null);
 
             assertEquals(visitedCommits.size()-2, boundaryVisitedCommits.size());
             assertEquals(visitedCommits.get(2).getSHA(), boundaryVisitedCommits.get(0).getSHA()); // test the first visited commit
@@ -2096,7 +2096,7 @@ public class JGitRepositoryTests {
             repository.walkHistory(null, null, c -> {
                 visitedCommits.add(c);
                 return true;
-            });
+            }, null);
 
             assertEquals(10, visitedCommits.size());
             
@@ -2105,7 +2105,7 @@ public class JGitRepositoryTests {
             repository.walkHistory(null, visitedCommits.get(visitedCommits.size()-3).getSHA(), c -> {
                 boundaryVisitedCommits.add(c);
                 return true;
-            });
+            }, null);
 
             assertEquals(visitedCommits.size()-2, boundaryVisitedCommits.size());
             assertEquals(visitedCommits.get(0).getSHA(), boundaryVisitedCommits.get(0).getSHA()); // test the first visited commit
@@ -2123,7 +2123,7 @@ public class JGitRepositoryTests {
             repository.walkHistory(null, null, c -> {
                 visitedCommits.add(c);
                 return true;
-            });
+            }, null);
 
             assertEquals(10, visitedCommits.size());
             
@@ -2132,7 +2132,7 @@ public class JGitRepositoryTests {
             repository.walkHistory(visitedCommits.get(2).getSHA(), visitedCommits.get(visitedCommits.size()-3).getSHA(), c -> {
                 boundaryVisitedCommits.add(c);
                 return true;
-            });
+            }, null);
 
             assertEquals(visitedCommits.size()-4, boundaryVisitedCommits.size());
             assertEquals(visitedCommits.get(2).getSHA(), boundaryVisitedCommits.get(0).getSHA()); // test the first visited commit
@@ -2151,7 +2151,7 @@ public class JGitRepositoryTests {
             assertThrows(GitException.class, () -> repository.walkHistory("d0a19fc5776dc0c0b1a8d869c1117dac71065870", null, c -> {
                 visitedCommits.add(c);
                 return true;
-            }));
+            }, null));
 
             assertEquals(0, visitedCommits.size());
         }
@@ -2168,7 +2168,7 @@ public class JGitRepositoryTests {
             assertThrows(GitException.class, () -> repository.walkHistory(null, "31cab6562ed66dfc71a4fcf65292a97fb81e0e75", c -> {
                 visitedCommits.add(c);
                 return true;
-            }));
+            }, null));
 
             assertEquals(0, visitedCommits.size());
         }
@@ -2185,7 +2185,7 @@ public class JGitRepositoryTests {
             assertThrows(GitException.class, () -> repository.walkHistory("d0a19fc5776dc0c0b1a8d869c1117dac71065870", "31cab6562ed66dfc71a4fcf65292a97fb81e0e75", c -> {
                 visitedCommits.add(c);
                 return true;
-            }));
+            }, null));
 
             assertEquals(0, visitedCommits.size());
         }
@@ -2212,16 +2212,72 @@ public class JGitRepositoryTests {
             repository.walkHistory(null, null, c -> {
                 visitedCommitsWithoutBoundaries.add(c);
                 return true;
-            });
+            }, null);
 
             // now do the same walk with boundaries
             // this boundary is out of the branch we're working in to the repository, so it should not affect the outcome
             repository.walkHistory(null, alphaHead, c -> {
                 visitedCommitsWithBoundaries.add(c);
                 return true;
-            });
+            }, null);
 
             assertEquals(visitedCommitsWithoutBoundaries.size(), visitedCommitsWithBoundaries.size());
+        }
+
+        @DisplayName("JGitRepository.walkHistory(null, null, CommitVisitor, null)")
+        @Test
+        public void walkHistoryWithExcludePathsIsNull()
+                throws Exception {
+            Repository repository = JGitRepository.open(Scenario.BRANCH_WITH_SUBDIRS.realize().getWorkingDirectory());
+            // Keep track of the visited commits
+            List<Commit> visitedCommits = new ArrayList<Commit>();
+            repository.walkHistory(null, null, c -> {
+                visitedCommits.add(c);
+                return true;
+            }, null);
+            assertEquals(5, visitedCommits.size());
+        }
+
+        @DisplayName("JGitRepository.walkHistory(null, null, CommitVisitor, List.of())")
+        @Test
+        public void walkHistoryWithExcludePathsHasZeroElements()
+                throws Exception {
+            Repository repository = JGitRepository.open(Scenario.BRANCH_WITH_SUBDIRS.realize().getWorkingDirectory());
+            // Keep track of the visited commits
+            List<Commit> visitedCommits = new ArrayList<Commit>();
+            repository.walkHistory(null, null, c -> {
+                visitedCommits.add(c);
+                return true;
+            }, List.of());
+            assertEquals(5, visitedCommits.size());
+        }
+
+        @DisplayName("JGitRepository.walkHistory(null, null, CommitVisitor, List.of(\"PathA\"))")
+        @Test
+        public void walkHistoryWithExcludePathA()
+                throws Exception {
+            Repository repository = JGitRepository.open(Scenario.BRANCH_WITH_SUBDIRS.realize().getWorkingDirectory());
+            // Keep track of the visited commits
+            List<Commit> visitedCommits = new ArrayList<Commit>();
+            repository.walkHistory(null, null, c -> {
+                visitedCommits.add(c);
+                return true;
+            }, List.of("pathA"));
+            assertEquals(3, visitedCommits.size());
+        }
+
+        @DisplayName("JGitRepository.walkHistory(null, null, CommitVisitor, List.of(\"PathB\"))")
+        @Test
+        public void walkHistoryWithExcludePathB()
+                throws Exception {
+            Repository repository = JGitRepository.open(Scenario.BRANCH_WITH_SUBDIRS.realize().getWorkingDirectory());
+            // Keep track of the visited commits
+            List<Commit> visitedCommits = new ArrayList<Commit>();
+            repository.walkHistory(null, null, c -> {
+                visitedCommits.add(c);
+                return true;
+            }, List.of("pathB"));
+            assertEquals(4, visitedCommits.size());
         }
     }
 }

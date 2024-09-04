@@ -15,6 +15,7 @@
  */
 package com.mooltiverse.oss.nyx.configuration;
 
+import java.util.Collection;
 import java.util.Map;
 
 import com.mooltiverse.oss.nyx.entities.Attachment;
@@ -293,4 +294,15 @@ public interface ConfigurationRoot {
      */
     public String getVersion()
         throws DataAccessException, IllegalPropertyException;
+
+    /**
+     * Returns the collection of paths to exclude while examining commits
+     *
+     * @return the configured value for this option or {@code null} if the value hasn't been defined.
+     *
+     * @throws DataAccessException in case the option cannot be read or accessed.
+     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
+     */
+    public Collection<String> getExcludePaths()
+            throws DataAccessException, IllegalPropertyException;
 }

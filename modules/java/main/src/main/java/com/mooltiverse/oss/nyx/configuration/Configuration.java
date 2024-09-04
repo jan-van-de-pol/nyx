@@ -20,6 +20,7 @@ import static com.mooltiverse.oss.nyx.log.Markers.CONFIGURATION;
 import java.io.File;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -869,5 +870,22 @@ public class Configuration implements ConfigurationRoot {
             }
         }
         return DefaultLayer.getInstance().getVersion();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<String> getExcludePaths()
+            throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "excludePaths");
+        for (ConfigurationLayer layer: layers.values()) {
+            Collection<String> excludePaths = layer.getExcludePaths();
+            if (!Objects.isNull(excludePaths)) {
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "excludePaths", excludePaths);
+                return excludePaths;
+            }
+        }
+        return DefaultLayer.getInstance().getExcludePaths();
     }
 }

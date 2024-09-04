@@ -214,6 +214,11 @@ public abstract class NyxExtension {
     private final Property<String> stateFile = getObjectfactory().property(String.class);
 
     /**
+     * The 'excludePaths' property.
+     */
+    private final Property<String> excludePaths = getObjectfactory().property(String.class);
+
+    /**
      * The nested 'substitutions' block.
      */
     private final Substitutions substitutions = getObjectfactory().newInstance(Substitutions.class);
@@ -599,6 +604,19 @@ public abstract class NyxExtension {
     public Property<String> getStateFile() {
         return stateFile;
     }
+
+    /**
+     * Returns the optional path where to save the state file.
+     *
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     *
+     * @return the directory to use as the base repository location
+     */
+    public Property<String> getExcludePaths() {
+        return excludePaths;
+    }
+
 
     /**
      * Returns the object mapping the {@code substitutions} block.
